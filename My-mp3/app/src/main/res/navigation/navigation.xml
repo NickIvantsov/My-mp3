@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/mainActivity">
+    app:startDestination="@id/mainFragment">
 
     <activity
         android:id="@+id/mainActivity"
@@ -14,4 +14,9 @@
         android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.SplashActivity"
         android:label="activity_splash"
         tools:layout="@layout/activity_splash" />
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.MainFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/main_fragment" />
 </navigation>
