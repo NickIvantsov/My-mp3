@@ -5,13 +5,14 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.provider.MediaStore
-import com.gmail.ivantsov.nikolai.core.domain.Song
+import com.gmail.ivantsov.nikolai.core.domain.IPauseSong
 import com.gmail.ivantsov.nikolai.core.domain.IPlaySong
+import com.gmail.ivantsov.nikolai.core.domain.Song
 import timber.log.Timber
 import java.io.IOException
 
-class MusicPlay(private val context: Context, private val mediaPlayer: MediaPlayer) :
-    IPlaySong {
+class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPlayer) :
+    IPlaySong, IPauseSong {
     override fun play(song: Song) {
         playImpl(song)
     }
@@ -38,5 +39,9 @@ class MusicPlay(private val context: Context, private val mediaPlayer: MediaPlay
             Timber.e(e)
         }
         mediaPlayer.start()
+    }
+
+    override fun pause() {
+        mediaPlayer.pause()
     }
 }
