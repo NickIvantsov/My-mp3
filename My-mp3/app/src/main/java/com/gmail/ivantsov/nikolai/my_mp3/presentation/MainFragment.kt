@@ -6,9 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.gmail.ivantsov.nikolai.my_mp3.R
+import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
 import com.gmail.ivantsov.nikolai.my_mp3.presentation.library.MainViewModel
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class MainFragment : Fragment() {
 
@@ -16,13 +17,17 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
+    private var bindingImpl: MainFragmentBinding? = null
+    private val binding get() = bindingImpl!!
+
     private val viewModel by inject<MainViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.main_fragment, container, false)
+        bindingImpl = MainFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -33,8 +38,8 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.loadSongs()
-        viewModel.getSongsLiveData().observe(viewLifecycleOwner){
-            Log.d("TAG_LOG",it.toString())
+        viewModel.getSongsLiveData().observe(viewLifecycleOwner) {
+            Timber.d( it.toString())
         }
     }
 }

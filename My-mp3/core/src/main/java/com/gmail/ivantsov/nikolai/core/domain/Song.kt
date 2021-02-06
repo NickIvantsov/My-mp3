@@ -1,6 +1,6 @@
 package com.gmail.ivantsov.nikolai.core.domain
 
-class Song(
+data class Song(
     val id: Long = LONG_NOT_INIT,
     val albumId: Long = LONG_NOT_INIT,
     val artistId: Long = LONG_NOT_INIT,
