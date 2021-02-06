@@ -47,5 +47,8 @@ class MainFragment : Fragment() {
         viewModel.getSongsLiveData().observe(viewLifecycleOwner) { songsList ->
             songsAdapter.addAll(songsList)
         }
+        songsAdapter.itemClickListener = {
+            viewModel.playSong(it)
+        }
     }
 }

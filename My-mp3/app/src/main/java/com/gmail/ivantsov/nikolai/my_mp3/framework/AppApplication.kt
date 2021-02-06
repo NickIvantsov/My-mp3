@@ -16,12 +16,12 @@ class AppApplication : Application() {
                 dataSourceModule,
                 interactorsModule,
                 repositoryModule,
-                adapterModule
+                adapterModule,
+                mediaPlayerModule
             )
         )
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-
         } else {
             Timber.plant(ReleaseThree())
         }
