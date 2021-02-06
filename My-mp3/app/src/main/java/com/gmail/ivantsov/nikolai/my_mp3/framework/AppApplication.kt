@@ -2,10 +2,7 @@ package com.gmail.ivantsov.nikolai.my_mp3.framework
 
 import android.app.Application
 import com.gmail.ivantsov.nikolai.my_mp3.BuildConfig
-import com.gmail.ivantsov.nikolai.my_mp3.framework.di.dataSourceModule
-import com.gmail.ivantsov.nikolai.my_mp3.framework.di.interactorsModule
-import com.gmail.ivantsov.nikolai.my_mp3.framework.di.repositoryModule
-import com.gmail.ivantsov.nikolai.my_mp3.framework.di.viewModelModule
+import com.gmail.ivantsov.nikolai.my_mp3.framework.di.*
 import org.koin.android.ext.android.startKoin
 import timber.log.Timber
 
@@ -18,7 +15,8 @@ class AppApplication : Application() {
                 viewModelModule,
                 dataSourceModule,
                 interactorsModule,
-                repositoryModule
+                repositoryModule,
+                adapterModule
             )
         )
         if (BuildConfig.DEBUG) {
