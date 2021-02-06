@@ -1,6 +1,9 @@
 package com.gmail.ivantsov.nikolai.my_mp3.presentation
 
+import android.Manifest
+import android.R
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -9,31 +12,87 @@ import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.gmail.ivantsov.nikolai.my_mp3.R
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.gmail.ivantsov.nikolai.my_mp3.databinding.ActivitySplashBinding
+import com.google.android.material.snackbar.Snackbar
+
 
 class SplashActivity : AppCompatActivity() {
     companion object {
         private const val NAVIGATION_DELAY_MILLIS = 2_000L
+        private const val READ_STORAGE_PERMISSION_CODE = 1
     }
+
+
+    private var bindingImpl: ActivitySplashBinding? = null
+    private val binding get() = bindingImpl!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        bindingImpl = ActivitySplashBinding.inflate(layoutInflater)
         makeFullScreen()
-        setContentView(R.layout.activity_splash)
+        setContentView(binding.root)
+        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, READ_STORAGE_PERMISSION_CODE)
+    }
 
-        // Using a handler to delay loading the MainActivity
-        Handler(Looper.getMainLooper()).postDelayed({
 
-            // Start activity
-            startActivity(Intent(this, MainActivity::class.java))
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super
+            .onRequestPermissionsResult(
+                requestCode,
+                permissions,
+                grantResults
+            )
+        if (requestCode == READ_STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty()
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+                navToMainActivity()
+            } else {
+                showMessage(com.gmail.ivantsov.nikolai.my_mp3.R.string.read_not_granted_mess)
+            }
+        }
+    }
 
-            // Animate the loading of new activity
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    private fun showMessage(message:Int) {
+        Snackbar.make(
+            binding.mainContainer,
+            getString(message),
+            Snackbar.LENGTH_INDEFINITE
+        )
+            .setAction(
+                getString(com.gmail.ivantsov.nikolai.my_mp3.R.string.ok)
+            ) {
+                checkPermission(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    READ_STORAGE_PERMISSION_CODE
+                )
+            }.show()
+    }
 
-            // Close this activity
-            finish()
+    // Function to check and request permission
+    private fun checkPermission(permission: String, requestCode: Int) {
 
-        }, NAVIGATION_DELAY_MILLIS)
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(
+                this,
+                permission
+            )
+            == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat
+                .requestPermissions(
+                    this, arrayOf(permission),
+                    requestCode
+                )
+        } else {
+            navToMainActivityWithDelay()
+        }
     }
 
     private fun makeFullScreen() {
@@ -52,4 +111,25 @@ class SplashActivity : AppCompatActivity() {
         // Hide the toolbar
         supportActionBar?.hide()
     }
+
+    private fun navToMainActivityWithDelay() {
+        // Using a handler to delay loading the MainActivity
+        Handler(Looper.getMainLooper()).postDelayed({
+            // Start activity
+            navToMainActivity()
+
+        }, NAVIGATION_DELAY_MILLIS)
+    }
+
+    private fun navToMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+
+        // Animate the loading of new activity
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+
+        // Close this activity
+        finish()
+    }
+
+
 }
