@@ -1,4 +1,4 @@
-package com.gmail.ivantsov.nikolai.my_mp3.framework.di
+package com.gmail.ivantsov.nikolai.my_mp3.di
 
 import com.gmail.ivantsov.nikolai.core.data.SongRepository
 import com.gmail.ivantsov.nikolai.my_mp3.framework.SongDataSource

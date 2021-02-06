@@ -1,4 +1,4 @@
-package com.gmail.ivantsov.nikolai.my_mp3.framework.di
+package com.gmail.ivantsov.nikolai.my_mp3.di
 
 import com.gmail.ivantsov.nikolai.my_mp3.presentation.library.SongsAdapter
 import org.koin.dsl.module.module

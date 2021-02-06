@@ -1,4 +1,4 @@
-package com.gmail.ivantsov.nikolai.my_mp3.framework.di
+package com.gmail.ivantsov.nikolai.my_mp3.di
 
 import android.app.Application
 import android.media.MediaPlayer
@@ -11,14 +11,13 @@ import org.koin.dsl.module.module
 val viewModelModule = module {
     fun provideMainViewModel(
         application: Application,
-        interactors: Interactors,
-        mediaPlayer: MediaPlayer
+        interactors: Interactors
     ): MainViewModel {
-        return MainViewModel(application, interactors, mediaPlayer)
+        return MainViewModel(application, interactors)
     }
 
     viewModel {
-        provideMainViewModel(androidApplication(), get(), get())
+        provideMainViewModel(androidApplication(), get())
     }
 
 }

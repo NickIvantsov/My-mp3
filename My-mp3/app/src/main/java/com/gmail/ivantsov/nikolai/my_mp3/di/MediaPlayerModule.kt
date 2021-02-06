@@ -1,4 +1,4 @@
-package com.gmail.ivantsov.nikolai.my_mp3.framework.di
+package com.gmail.ivantsov.nikolai.my_mp3.di
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
