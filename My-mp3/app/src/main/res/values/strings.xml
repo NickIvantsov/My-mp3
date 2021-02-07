@@ -2,4 +2,5 @@
     <string name="app_name">My-mp3</string>
     <string name="read_not_granted_mess">My mp3 will need to read external storage to display songs on your device.</string>
     <string name="ok">OK</string>
+    <string name="no_any_song">No any song!</string>
 </resources>

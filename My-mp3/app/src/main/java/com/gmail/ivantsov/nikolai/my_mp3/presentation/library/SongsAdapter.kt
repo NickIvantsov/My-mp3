@@ -11,10 +11,11 @@ import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 
 
-class SongsAdapter : RecyclerView.Adapter<SongsViewHolder>() {
+class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     //region поля
 
     lateinit var itemClickListener: (Song) -> Unit
+    private val EMPTY_VIEW = 77777
     private val songs: MutableList<Song> = mutableListOf()
     private lateinit var context: Context
     private var songItemPosition = INT_NOT_INIT
@@ -22,32 +23,46 @@ class SongsAdapter : RecyclerView.Adapter<SongsViewHolder>() {
 
     //endregion
     //region интерфейсы
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         context = parent.context
         val inflater = LayoutInflater.from(context)
-        val view: View =
-            inflater.inflate(R.layout.item_song, parent, false)
-        return SongsViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: SongsViewHolder, position: Int) {
-        val song = songs[position]
-        if (song.id == songItem?.id) {
-            setItemColorActive(holder, R.color.purple_200)
+        if (viewType == EMPTY_VIEW) {
+            val view: View =
+                inflater.inflate(R.layout.empty_songs_view, parent, false)
+            return EmptySongsViewHolder(view)
         } else {
-            setItemColorNotActive(holder, R.color.black)
+            val view: View =
+                inflater.inflate(R.layout.item_song, parent, false)
+            return SongsViewHolder(view)
         }
-        holder.binding.tvSongTitle.text = song.title
-        holder.binding.tvSongArtist.text = song.artistName
-        holder.binding.songItemContainer.setOnClickListener {
-            songItemPosition = position
-            songItem = song
-            setItemColorActiveAndUpdate(holder, R.color.purple_200)
-            itemClickListener(song)
-        }
+
     }
 
-    override fun getItemCount(): Int = songs.size
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (getItemViewType(position) == EMPTY_VIEW) {
+            //do nothing
+        } else {
+            val song = songs[position]
+            if (holder is SongsViewHolder) {
+                if (song.id == songItem?.id) {
+                    setItemColorActive(holder, R.color.purple_200)
+                } else {
+                    setItemColorNotActive(holder, R.color.black)
+                }
+                holder.binding.tvSongTitle.text = song.title
+                holder.binding.tvSongArtist.text = song.artistName
+                holder.binding.songItemContainer.setOnClickListener {
+                    songItemPosition = position
+                    songItem = song
+                    setItemColorActiveAndUpdate(holder, R.color.purple_200)
+                    itemClickListener(song)
+                }
+            }
+        }
+
+    }
+
+    override fun getItemCount(): Int = if (songs.size > 0) songs.size else 1
 
     fun add(song: Song) {
         songs.add(song)
@@ -57,6 +72,13 @@ class SongsAdapter : RecyclerView.Adapter<SongsViewHolder>() {
     fun addAll(songList: List<Song>) {
         songs.addAll(songList)
         notifyItemInserted(songs.size - 1)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (songs.size == 0) {
+            return EMPTY_VIEW
+        }
+        return super.getItemViewType(position)
     }
 
     //endregion
