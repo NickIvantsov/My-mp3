@@ -16,7 +16,7 @@
         tools:layout="@layout/activity_splash" />
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.MainFragment"
+        android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.library.MainFragment"
         android:label="main_fragment"
         tools:layout="@layout/main_fragment" />
 </navigation>

@@ -1,14 +1,13 @@
-package com.gmail.ivantsov.nikolai.my_mp3.presentation
+package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
-import com.gmail.ivantsov.nikolai.my_mp3.presentation.library.MainViewModel
-import com.gmail.ivantsov.nikolai.my_mp3.presentation.library.SongsAdapter
 import org.koin.android.ext.android.inject
 
 class MainFragment : Fragment() {
@@ -42,6 +41,7 @@ class MainFragment : Fragment() {
             setHasFixedSize(true)
             adapter = songsAdapter
             layoutManager = LinearLayoutManager(view.context)
+            addItemDecoration(DividerItemDecoration(this@MainFragment.context,DividerItemDecoration.VERTICAL))
         }
         viewModel.loadSongs()
         viewModel.getSongsLiveData().observe(viewLifecycleOwner) { songsList ->
