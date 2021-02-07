@@ -14,10 +14,13 @@ class MainViewModel(
     application: Application,
     private val interactors: Interactors
 ) : AndroidViewModel(application) {
+    //region поля
     private var isPlaying = false
     private var isPause = false
     private var songId = LONG_NOT_INIT
     private val songs: MutableLiveData<List<Song>> = MutableLiveData()
+    //endregion
+    //region интерфейсы
     fun loadSongs() {
         viewModelScope.launch {
             songs.postValue(interactors.getSongs())
@@ -27,22 +30,34 @@ class MainViewModel(
     fun getSongsLiveData(): LiveData<List<Song>> = songs
 
     fun playSong(song: Song) {
-        if (songId == song.id){
+        if (songId == song.id) {
             if (isPlaying) {
-                interactors.songPause.pause()
-                isPause = true
-                isPlaying = false
+                pause()
             } else if (isPause) {
-                interactors.songPlay.play(song)
-                isPlaying = true
-                isPause = false
+                resume()
             }
-        }else{
-            interactors.songPlay.play(song)
-            songId = song.id
-            isPlaying = true
+        } else {
+            play(song)
         }
-
+    }
+    //endregion
+    //region реализация
+    private fun play(song: Song) {
+        interactors.songPlay.play(song)
+        songId = song.id
+        isPlaying = true
     }
 
+    private fun resume() {
+        interactors.songResume.resume()
+        isPlaying = true
+        isPause = false
+    }
+
+    private fun pause() {
+        interactors.songPause.pause()
+        isPause = true
+        isPlaying = false
+    }
+    //endregion
 }

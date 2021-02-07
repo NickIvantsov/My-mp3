@@ -5,9 +5,11 @@ import android.media.MediaPlayer
 import com.gmail.ivantsov.nikolai.core.data.SongRepository
 import com.gmail.ivantsov.nikolai.core.domain.IPauseSong
 import com.gmail.ivantsov.nikolai.core.domain.IPlaySong
+import com.gmail.ivantsov.nikolai.core.domain.IResumeSong
 import com.gmail.ivantsov.nikolai.core.interactors.GetSongs
 import com.gmail.ivantsov.nikolai.core.interactors.SongPause
 import com.gmail.ivantsov.nikolai.core.interactors.SongPlay
+import com.gmail.ivantsov.nikolai.core.interactors.SongResume
 import com.gmail.ivantsov.nikolai.my_mp3.framework.Interactors
 import com.gmail.ivantsov.nikolai.my_mp3.framework.MusicPlayer
 import org.koin.android.ext.koin.androidContext
@@ -18,11 +20,13 @@ val interactorsModule = module {
         getSongs: GetSongs,
         songPlay: SongPlay,
         songPause: SongPause,
+        songResume: SongResume
     ): Interactors {
         return Interactors(
             getSongs,
             songPlay,
-            songPause
+            songPause,
+            songResume
         )
     }
 
@@ -38,12 +42,17 @@ val interactorsModule = module {
         return SongPause(songPauseImpl)
     }
 
+    fun provideResumeSong(songResumeImpl: IResumeSong): SongResume {
+        return SongResume(songResumeImpl)
+    }
+
     fun provideMusicPlay(context: Context, mediaPlayer: MediaPlayer): MusicPlayer {
         return MusicPlayer(context, mediaPlayer)
     }
-    single { provideInteractors(get(), get(), get()) }
+    single { provideInteractors(get(), get(), get(), get()) }
     single { provideGetSongs(get()) }
     single { providePlaySong(get<MusicPlayer>()) }
     single { providePauseSong(get<MusicPlayer>()) }
+    single { provideResumeSong(get<MusicPlayer>()) }
     single { provideMusicPlay(androidContext(), get()) }
 }
