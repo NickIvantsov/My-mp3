@@ -3,9 +3,12 @@ package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,7 +17,8 @@ import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 
 
-class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SongsAdapter(private val songsFilter: SongsFilter) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     //region поля
 
     companion object {
@@ -25,6 +29,7 @@ class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     lateinit var itemClickListener: (Song) -> Unit
     private val songs: MutableList<Song> = mutableListOf()
+    private val songsFull: MutableList<Song> = mutableListOf()
     private lateinit var context: Context
     private var songItemPosition = INT_NOT_INIT
     private var songItem: Song? = null
@@ -37,6 +42,13 @@ class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
 
     //endregion
+    init {
+        songsFilter.init(songsFull, songs) {
+            notifyDataSetChanged()
+        }
+        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    }
+
     //region интерфейсы
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         context = parent.context
@@ -95,6 +107,7 @@ class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun addAll(songList: List<Song>) {
         songs.addAll(songList)
+        songsFull.addAll(songList)
         if (songList.size == 1)
             notifyItemInserted(songs.size)
         else {
@@ -163,5 +176,7 @@ class SongsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             .placeholder(R.drawable.ic_baseline_headset_24)
             .into(holder.binding.imageView3);
     }
+
+    override fun getFilter(): Filter = songsFilter
     //endregion
 }
