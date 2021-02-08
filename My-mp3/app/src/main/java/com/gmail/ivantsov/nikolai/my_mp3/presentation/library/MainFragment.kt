@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class MainFragment : Fragment() {
 
@@ -41,11 +43,19 @@ class MainFragment : Fragment() {
             setHasFixedSize(true)
             adapter = songsAdapter
             layoutManager = LinearLayoutManager(view.context)
-            addItemDecoration(DividerItemDecoration(this@MainFragment.context,DividerItemDecoration.VERTICAL))
+            addItemDecoration(
+                DividerItemDecoration(
+                    this@MainFragment.context,
+                    DividerItemDecoration.VERTICAL
+                )
+            )
         }
         viewModel.loadSongs()
         viewModel.getSongsLiveData().observe(viewLifecycleOwner) { songsList ->
             songsAdapter.addAll(songsList)
+        }
+        viewModel.getErrorLiveData().observe(viewLifecycleOwner) {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
         songsAdapter.itemClickListener = {
             viewModel.playSong(it)

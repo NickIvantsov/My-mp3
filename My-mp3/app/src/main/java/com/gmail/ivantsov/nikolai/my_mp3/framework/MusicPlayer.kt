@@ -9,16 +9,22 @@ import com.gmail.ivantsov.nikolai.core.domain.IPauseSong
 import com.gmail.ivantsov.nikolai.core.domain.IPlaySong
 import com.gmail.ivantsov.nikolai.core.domain.IResumeSong
 import com.gmail.ivantsov.nikolai.core.domain.Song
-import timber.log.Timber
 import java.io.IOException
 
 class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPlayer) :
     IPlaySong, IPauseSong, IResumeSong {
     //region интерфейсы
+    @Throws(
+        IOException::class,
+        IllegalArgumentException::class,
+        IllegalStateException::class,
+        SecurityException::class
+    )
     override fun play(song: Song) {
         playImpl(song)
     }
 
+    @Throws(IllegalStateException::class)
     override fun pause() {
         mediaPlayer.pause()
     }
@@ -26,8 +32,15 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
     override fun resume() {
         playSong()
     }
+
     //endregion
     //region реализация
+    @Throws(
+        IOException::class,
+        IllegalArgumentException::class,
+        IllegalStateException::class,
+        SecurityException::class
+    )
     private fun playImpl(song: Song) {
         resetSong()
         setDataSource(song)
@@ -35,26 +48,19 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
         playSong()
     }
 
+    @Throws(
+        IOException::class,
+        IllegalArgumentException::class,
+        IllegalStateException::class,
+        SecurityException::class
+    )
     private fun setDataSource(song: Song) {
-        try {
-            mediaPlayer.setDataSource(context, getSongUri(song))
-        } catch (e: IllegalArgumentException) {
-            Timber.e(e)
-        } catch (e: IllegalStateException) {
-            Timber.e(e)
-        } catch (e: IOException) {
-            Timber.e(e)
-        }
+        mediaPlayer.setDataSource(context, getSongUri(song))
     }
 
+    @Throws(IOException::class, IllegalStateException::class)
     private fun prepareSong() {
-        try {
-            mediaPlayer.prepare()
-        } catch (e: IllegalStateException) {
-            Timber.e(e)
-        } catch (e: IOException) {
-            Timber.e(e)
-        }
+        mediaPlayer.prepare()
     }
 
     private fun resetSong() {
@@ -64,6 +70,7 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
     private fun getSongUri(song: Song): Uri =
         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.id)
 
+    @Throws(IllegalStateException::class)
     private fun playSong() {
         mediaPlayer.start()
     }
