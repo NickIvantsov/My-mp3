@@ -15,9 +15,13 @@ import com.bumptech.glide.Glide
 import com.gmail.ivantsov.nikolai.core.domain.INT_NOT_INIT
 import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
+import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
 
 
-class SongsAdapter(private val songsFilter: SongsFilter) :
+class SongsAdapter(
+    private val songsFilter: Filter,
+    initSongsFilterComponent: IInitSongsFilterComponent
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
     //region поля
 
@@ -43,59 +47,59 @@ class SongsAdapter(private val songsFilter: SongsFilter) :
 
     //endregion
     init {
-        songsFilter.init(songsFull, songs) {
+        initSongsFilterComponent.init(songsFull, songs) {
             notifyDataSetChanged()
         }
-        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     }
 
     //region интерфейсы
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         context = parent.context
         val inflater = LayoutInflater.from(context)
-        return if (viewType == EMPTY_VIEW) {
-            EmptySongsViewHolder(
-                getView(
-                    inflater,
-                    parent,
-                    R.layout.empty_songs_view
-                )
-            )
-        } else {
-            SongsViewHolder(
-                getView(
-                    inflater,
-                    parent,
-                    R.layout.item_song
-                )
-            )
-        }
+        return viewHolderFor(viewType, inflater, parent)
 
     }
 
+    private fun viewHolderFor(
+        viewType: Int,
+        inflater: LayoutInflater,
+        parent: ViewGroup
+    ) = if (viewType == EMPTY_VIEW) {
+        EmptySongsViewHolder(
+            getView(
+                inflater,
+                parent,
+                R.layout.empty_songs_view
+            )
+        )
+    } else {
+        SongsViewHolder(
+            getView(
+                inflater,
+                parent,
+                R.layout.item_song
+            )
+        )
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (getItemViewType(position) == EMPTY_VIEW) {
-            //do nothing
-        } else {
+        if (getItemViewType(position) != EMPTY_VIEW) {
             val song = songs[position]
             if (holder is SongsViewHolder) {
                 setItemColor(song, holder)
                 holder.binding.tvSongTitle.text = song.title
                 holder.binding.tvSongArtist.text = song.artistName
                 setAlbumArt(song, holder)
-                holder.binding.songItemContainer.setOnClickListener {
+                holder.binding.songItemContainer.setOnClickListener { view ->
                     itemOnClickListener(
-                        it,
+                        view,
                         holder,
                         position,
                         song
                     )
                 }
-            } else {
-                //todo добавить исключение
             }
         }
-
     }
 
     override fun getItemCount(): Int = if (songs.size > 0) songs.size else 1
@@ -121,6 +125,9 @@ class SongsAdapter(private val songsFilter: SongsFilter) :
         }
         return super.getItemViewType(position)
     }
+
+
+    override fun getFilter(): Filter = songsFilter
 
     //endregion
     //region реализация
@@ -177,6 +184,5 @@ class SongsAdapter(private val songsFilter: SongsFilter) :
             .into(holder.binding.imageView3);
     }
 
-    override fun getFilter(): Filter = songsFilter
     //endregion
 }

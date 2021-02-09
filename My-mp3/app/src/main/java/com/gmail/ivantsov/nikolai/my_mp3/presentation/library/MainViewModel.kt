@@ -7,10 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gmail.ivantsov.nikolai.core.domain.LONG_NOT_INIT
 import com.gmail.ivantsov.nikolai.core.domain.Song
+import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.framework.Interactors
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.IOException
 
 class MainViewModel(
     application: Application,
@@ -21,7 +21,7 @@ class MainViewModel(
     private var isPause = false
     private var songId = LONG_NOT_INIT
     private val songs: MutableLiveData<List<Song>> = MutableLiveData()
-    private val error: MutableLiveData<String> = MutableLiveData()
+    private val error: MutableLiveData<Int> = MutableLiveData()
 
     //endregion
     //region интерфейсы
@@ -32,41 +32,22 @@ class MainViewModel(
     }
 
     fun getSongsLiveData(): LiveData<List<Song>> = songs
-    fun getErrorLiveData(): LiveData<String> = error
+    fun getErrorLiveData(): LiveData<Int> = error
 
     fun playSong(song: Song) {
-        if (songId == song.id) {
-            if (isPlaying) {
-                try {
+        try {
+            if (songId == song.id) {
+                if (isPlaying) {
                     pause()
-                } catch (ex: IllegalStateException) {
-                    error.value = "Внутренний движок плеера не был инициализирован." //todo хардкод
-                    Timber.e(ex)
-                }
-            } else if (isPause) {
-                try {
+                } else if (isPause) {
                     resume()
-                } catch (ex: Throwable) {
-                    error.value = ex.message
-                    Timber.e(ex)
                 }
-            }
-        } else {
-            try {
+            } else {
                 play(song)
-            } catch (ex: IllegalArgumentException) {
-                error.value = ex.message
-                Timber.e(ex)
-            } catch (ex: IllegalStateException) {
-                error.value = "Вызван в недопустимом состоянии." //todo хардкод
-                Timber.e(ex)
-            } catch (ex: SecurityException) {
-                error.value = "нарушение безопасности ${ex.message}" //todo хардкод
-                Timber.e(ex)
-            } catch (ex: IOException) {
-                error.value = "Произошло какое-то исключение ввода-вывода." //todo хардкод
-                Timber.e(ex)
             }
+        } catch (ex: Throwable) {
+            error.value = R.string.some_unknown_error_media_player
+            Timber.e(ex)
         }
     }
 

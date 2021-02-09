@@ -3,4 +3,6 @@
     <string name="read_not_granted_mess">My mp3 will need to read external storage to display songs on your device.</string>
     <string name="ok">OK</string>
     <string name="no_any_song">No any song!</string>
+    <string name="error_inner_engine_media_player">Внутренний движок плеера не был инициализирован.</string>
+    <string name="some_unknown_error_media_player">Some unknown error ...</string>
 </resources>

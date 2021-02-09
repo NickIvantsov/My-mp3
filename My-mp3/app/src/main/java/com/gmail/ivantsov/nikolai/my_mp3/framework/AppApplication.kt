@@ -20,6 +20,10 @@ class AppApplication : Application() {
                 mediaPlayerModule
             )
         )
+        setLogTimberPlane()
+    }
+
+    private fun setLogTimberPlane() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {

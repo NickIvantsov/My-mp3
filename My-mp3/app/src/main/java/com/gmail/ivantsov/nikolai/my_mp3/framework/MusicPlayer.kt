@@ -21,16 +21,20 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
         SecurityException::class
     )
     override fun play(song: Song) {
-        playImpl(song)
+        playImpl(song, mediaPlayer, context)
     }
 
     @Throws(IllegalStateException::class)
     override fun pause() {
+        pauseImpl(mediaPlayer)
+    }
+
+    private fun pauseImpl(mediaPlayer: MediaPlayer) {
         mediaPlayer.pause()
     }
 
     override fun resume() {
-        playSong()
+        resumeSong(mediaPlayer)
     }
 
     //endregion
@@ -41,11 +45,11 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
         IllegalStateException::class,
         SecurityException::class
     )
-    private fun playImpl(song: Song) {
-        resetSong()
-        setDataSource(song)
-        prepareSong()
-        playSong()
+    private fun playImpl(song: Song, mediaPlayer: MediaPlayer, context: Context) {
+        resetSong(mediaPlayer)
+        setDataSource(song, mediaPlayer, context)
+        prepareSong(mediaPlayer)
+        playSong(mediaPlayer)
     }
 
     @Throws(
@@ -54,16 +58,16 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
         IllegalStateException::class,
         SecurityException::class
     )
-    private fun setDataSource(song: Song) {
+    private fun setDataSource(song: Song, mediaPlayer: MediaPlayer, context: Context) {
         mediaPlayer.setDataSource(context, getSongUri(song))
     }
 
     @Throws(IOException::class, IllegalStateException::class)
-    private fun prepareSong() {
+    private fun prepareSong(mediaPlayer: MediaPlayer) {
         mediaPlayer.prepare()
     }
 
-    private fun resetSong() {
+    private fun resetSong(mediaPlayer: MediaPlayer) {
         mediaPlayer.reset()
     }
 
@@ -71,8 +75,13 @@ class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPl
         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.id)
 
     @Throws(IllegalStateException::class)
-    private fun playSong() {
+    private fun playSong(mediaPlayer: MediaPlayer) {
         mediaPlayer.start()
+    }
+
+    @Throws(IllegalStateException::class)
+    private fun resumeSong(mediaPlayer: MediaPlayer) {
+        playSong(mediaPlayer)
     }
     //endregion
 

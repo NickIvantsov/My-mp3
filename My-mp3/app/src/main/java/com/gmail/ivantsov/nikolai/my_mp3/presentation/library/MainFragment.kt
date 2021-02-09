@@ -7,12 +7,13 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
 import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 
 class MainFragment : Fragment() {
@@ -26,7 +27,19 @@ class MainFragment : Fragment() {
 
     private val viewModel by inject<MainViewModel>()
     private val songsAdapter by inject<SongsAdapter>()
+    private val dividerItemDecoration by inject<DividerItemDecoration>()
+    private val linearLayoutManager by inject<LinearLayoutManager>()
 
+    private val songsObserver = Observer<List<Song>> { songsList ->
+        songsAdapter.addAll(songsList)
+    }
+    private val errorMsgObserver = Observer<Int> { errorMsg ->
+        Toast.makeText(context, requireContext().resources.getText(errorMsg), Toast.LENGTH_LONG)
+            .show()
+    }
+    private val itemSongListener = { song: Song ->
+        viewModel.playSong(song)
+    }
     private val searchTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String): Boolean {
             return false
@@ -46,7 +59,7 @@ class MainFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         bindingImpl = MainFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -61,45 +74,34 @@ class MainFragment : Fragment() {
         binding.rvSongs.apply {
             setHasFixedSize(true)
             adapter = songsAdapter
-            layoutManager = LinearLayoutManager(view.context)
-            addItemDecoration(
-                DividerItemDecoration(
-                    this@MainFragment.context,
-                    DividerItemDecoration.VERTICAL
-                )
-            )
+            layoutManager = linearLayoutManager
+            addItemDecoration(dividerItemDecoration)
         }
         viewModel.loadSongs()
-        viewModel.getSongsLiveData().observe(viewLifecycleOwner) { songsList ->
-            songsAdapter.addAll(songsList)
-        }
-        viewModel.getErrorLiveData().observe(viewLifecycleOwner) {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-        }
-        songsAdapter.itemClickListener = {
-            viewModel.playSong(it)
-        }
+        viewModel.getSongsLiveData().observe(viewLifecycleOwner, songsObserver)
+        viewModel.getErrorLiveData().observe(viewLifecycleOwner, errorMsgObserver)
+        songsAdapter.itemClickListener = itemSongListener
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
 
         inflater.inflate(R.menu.menu_search_song, menu)
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
-        searchItem.isEnabled = true
         val searchManager =
             requireActivity().getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-        if (searchManager != null) {
-            val searchView = searchItem.actionView as? SearchView
-            if (searchView != null) {
-                searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-                searchView.setOnQueryTextListener(searchTextListener)
-            } else {
-                Timber.d("searchView IS NULL")
+        searchManager?.let { searchManagerValue ->
+            (searchItem.actionView as? SearchView)?.let { searchViewValue ->
+                searchViewValue.apply {
+                    setSearchableInfo(
+                        searchManagerValue.getSearchableInfo(
+                            requireActivity().componentName
+                        )
+                    )
+                    setOnQueryTextListener(searchTextListener)
+                }
             }
-        } else {
-            Timber.d("searchManager IS NULL")
-        }
 
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 }

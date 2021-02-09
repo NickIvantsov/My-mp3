@@ -2,6 +2,7 @@ package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 
 import android.widget.Filter
 import com.gmail.ivantsov.nikolai.core.domain.Song
+import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -12,11 +13,15 @@ import kotlin.collections.ArrayList
  * выполнить после того как мы заполнели список который необходимо отобразить. К примеру вызвать
  * метод обновления списка
  */
-class SongsFilter : Filter() {
+class SongsFilter : Filter(), IInitSongsFilterComponent {
     private lateinit var songsFull: List<Song>
     private lateinit var songs: MutableList<Song>
     private lateinit var publishResultsListener: () -> Unit
-    fun init(songsFull: List<Song>, songs: MutableList<Song>, publishResults: () -> Unit = {}) {
+    override fun init(
+        songsFull: List<Song>,
+        songs: MutableList<Song>,
+        publishResults: () -> Unit
+    ) {
         this.songsFull = songsFull
         this.songs = songs
         this.publishResultsListener = publishResults
@@ -44,7 +49,7 @@ class SongsFilter : Filter() {
         val res = (results?.values as? ArrayList<Song>)
         if (res != null) {
             songs.addAll(res)
-        }else{
+        } else {
             //todo
         }
         publishResultsListener()
