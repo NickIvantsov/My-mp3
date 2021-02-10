@@ -3,7 +3,6 @@ package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,15 +19,22 @@ import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
 
 class SongsAdapter(
     private val songsFilter: Filter,
-    initSongsFilterComponent: IInitSongsFilterComponent
+    initSongsFilterComponent: IInitSongsFilterComponent? = null
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
+
     //region поля
 
     companion object {
         private const val EMPTY_VIEW = 77777
         private const val URL_TO_ALBUM_ART = "content://media/external/audio/albumart"
         private const val LIST_EMPTY = 0
+
+        /**
+         * список имеет только один элемент (примечание вероятно этот элемент содержит не песню, а
+         * является сигналом для
+         */
+        private const val LIST_HAVE_ONE_ELEMENT = 1
     }
 
     lateinit var itemClickListener: (Song) -> Unit
@@ -47,7 +53,7 @@ class SongsAdapter(
 
     //endregion
     init {
-        initSongsFilterComponent.init(songsFull, songs) {
+        initSongsFilterComponent?.init(songsFull, songs) {
             notifyDataSetChanged()
         }
     }
@@ -102,18 +108,24 @@ class SongsAdapter(
         }
     }
 
-    override fun getItemCount(): Int = if (songs.size > 0) songs.size else 1
+
+    override fun getItemCount(): Int = if (songs.size > 0) songs.size else LIST_HAVE_ONE_ELEMENT
 
     fun add(song: Song) {
         songs.add(song)
+
         notifyItemInserted(songs.size - 1)
     }
 
     fun addAll(songList: List<Song>) {
         songs.addAll(songList)
         songsFull.addAll(songList)
-        if (songList.size == 1)
-            notifyItemInserted(songs.size)
+        updateAfterAdd(songList)
+    }
+
+    private fun updateAfterAdd(songList: List<Song>) {
+        if (songList.size == LIST_HAVE_ONE_ELEMENT)
+            notifyDataSetChanged()
         else {
             notifyItemInserted(songs.size - 1)
         }
