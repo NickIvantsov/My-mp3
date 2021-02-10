@@ -3,7 +3,10 @@ package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -51,6 +54,30 @@ class MainFragment : Fragment() {
         }
     }
 
+    private val onMenuItemClickListener = { menuItem: MenuItem ->
+        when (menuItem.itemId) {
+            R.id.action_search -> {
+                val searchManager =
+                    requireActivity().getSystemService(Context.SEARCH_SERVICE) as? SearchManager
+                searchManager?.let { searchManagerValue ->
+                    (menuItem.actionView as? SearchView)?.let { searchViewValue ->
+                        searchViewValue.apply {
+                            setSearchableInfo(
+                                searchManagerValue.getSearchableInfo(
+                                    requireActivity().componentName
+                                )
+                            )
+                            setOnQueryTextListener(searchTextListener)
+                        }
+                    }
+
+                }
+                true
+            }
+            else -> false
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -81,27 +108,6 @@ class MainFragment : Fragment() {
         viewModel.getSongsLiveData().observe(viewLifecycleOwner, songsObserver)
         viewModel.getErrorLiveData().observe(viewLifecycleOwner, errorMsgObserver)
         songsAdapter.itemClickListener = itemSongListener
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-
-        inflater.inflate(R.menu.menu_search_song, menu)
-        val searchItem: MenuItem = menu.findItem(R.id.action_search)
-        val searchManager =
-            requireActivity().getSystemService(Context.SEARCH_SERVICE) as? SearchManager
-        searchManager?.let { searchManagerValue ->
-            (searchItem.actionView as? SearchView)?.let { searchViewValue ->
-                searchViewValue.apply {
-                    setSearchableInfo(
-                        searchManagerValue.getSearchableInfo(
-                            requireActivity().componentName
-                        )
-                    )
-                    setOnQueryTextListener(searchTextListener)
-                }
-            }
-
-        }
-        super.onCreateOptionsMenu(menu, inflater)
+        binding.toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
     }
 }
