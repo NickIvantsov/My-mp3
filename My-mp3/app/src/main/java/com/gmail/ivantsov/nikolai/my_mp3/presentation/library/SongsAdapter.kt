@@ -15,6 +15,8 @@ import com.gmail.ivantsov.nikolai.core.domain.INT_NOT_INIT
 import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
+import timber.log.Timber
+import kotlin.properties.Delegates
 
 
 class SongsAdapter(
@@ -89,13 +91,17 @@ class SongsAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         if (getItemViewType(position) != EMPTY_VIEW) {
             val song = songs[position]
             if (holder is SongsViewHolder) {
+
+
                 setItemColor(song, holder)
                 holder.binding.tvSongTitle.text = song.title
                 holder.binding.tvSongArtist.text = song.artistName
                 setAlbumArt(song, holder)
+
                 holder.binding.songItemContainer.setOnClickListener { view ->
                     itemOnClickListener(
                         view,
@@ -104,6 +110,19 @@ class SongsAdapter(
                         song
                     )
                 }
+
+                if(songItem?.id == song.id){
+                    holder.binding.visualizer.setColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.purple_200
+                        )
+                    )
+                    holder.binding.visualizer.visibility = View.VISIBLE
+                }else{
+                    holder.binding.visualizer.visibility = View.GONE
+                }
+
             }
         }
     }
