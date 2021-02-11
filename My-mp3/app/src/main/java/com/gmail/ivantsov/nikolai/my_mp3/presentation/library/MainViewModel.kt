@@ -46,6 +46,8 @@ class MainViewModel(
                 play(song)
             }
         } catch (ex: Throwable) {
+            isPlaying = false
+            isPause = false
             error.value = R.string.some_unknown_error_media_player
             Timber.e(ex)
         }
@@ -54,8 +56,8 @@ class MainViewModel(
     //endregion
     //region реализация
     private fun play(song: Song) {
-        interactors.songPlay.play(song)
         songId = song.id
+        interactors.songPlay.play(song)
         isPlaying = true
     }
 

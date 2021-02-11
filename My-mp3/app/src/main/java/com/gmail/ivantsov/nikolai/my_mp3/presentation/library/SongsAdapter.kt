@@ -37,11 +37,12 @@ class SongsAdapter(
     }
 
     lateinit var itemClickListener: (Song) -> Unit
+    var isNeedPlay = true
     private val songs: MutableList<Song> = mutableListOf()
     private val songsFull: MutableList<Song> = mutableListOf()
     private var songItem: Song? = null
     private var isPlaying = false
-    private var isNewElement = false
+    private var isNewElement = true
     private val itemOnClickListener =
         { _: View, holder: SongsViewHolder, context: Context, song: Song ->
             songItem = song
@@ -100,6 +101,7 @@ class SongsAdapter(
                 holder.binding.songItemContainer.setOnClickListener { view ->
                     isNewElement = if (songItem?.id != song.id) {
                         isPlaying = false
+                        isNeedPlay = true
                         true
                     } else {
                         false
@@ -110,7 +112,9 @@ class SongsAdapter(
                         holder.binding.root.context,
                         song
                     )
-                    isPlaying = needViewVisualizer(holder)
+                    if (isNeedPlay){
+                        isPlaying = needViewVisualizer(holder)
+                    }
                 }
 
                 if (songItem?.id == song.id) {
