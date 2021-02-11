@@ -6,12 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.gmail.ivantsov.nikolai.my_mp3.presentation.library.MusicVisualizer
+    <com.gmail.ivantsov.nikolai.my_mp3.framework.MusicVisualizer
         android:id="@+id/visualizer"
-        android:layout_width="40dp"
+        android:layout_width="25dp"
         android:layout_height="40dp"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

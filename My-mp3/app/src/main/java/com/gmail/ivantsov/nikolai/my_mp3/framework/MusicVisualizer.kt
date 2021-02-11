@@ -1,4 +1,4 @@
-package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
+package com.gmail.ivantsov.nikolai.my_mp3.framework
 
 import android.content.Context
 import android.graphics.Canvas
@@ -35,30 +35,44 @@ class MusicVisualizer(context: Context, attrs: AttributeSet? = null) : View(cont
         paint.style = Paint.Style.FILL
         canvas.drawRect(
             getDimensionInPixel(0).toFloat(),
-            (height - (10 + random.nextInt(((height / 1f) - 25).toInt()))).toFloat(),
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),
             getDimensionInPixel(3).toFloat(),
-            (height - 30).toFloat(),
+            (height - 5).toFloat(),
             paint
         )
         canvas.drawRect(
-            getDimensionInPixel(10).toFloat(),
-            (height - (10 + random.nextInt(((height / 1f) - 25).toInt()))).toFloat(),
-            getDimensionInPixel(13).toFloat(),
-            (height - 30).toFloat(),
+            getDimensionInPixel(4).toFloat(),
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),
+            getDimensionInPixel(7).toFloat(),
+            (height - 5).toFloat(),
             paint
         )
         canvas.drawRect(
-            getDimensionInPixel(20).toFloat(),
-            (height - (10 + random.nextInt(((height / 1f) - 25).toInt()))).toFloat(),
-            getDimensionInPixel(23).toFloat(),
-            (height - 30).toFloat(),
+            getDimensionInPixel(8).toFloat(),
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),
+            getDimensionInPixel(11).toFloat(),
+            (height - 5).toFloat(),
             paint
         )
         canvas.drawRect(
-            getDimensionInPixel(30).toFloat(),//left,
-            (height - (10 + random.nextInt(((height / 1f) - 25).toInt()))).toFloat(),//top,
-            getDimensionInPixel(33).toFloat(),// right,
-            (height - 30).toFloat(),//bottom
+            getDimensionInPixel(12).toFloat(),//left,
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),//top,
+            getDimensionInPixel(15).toFloat(),// right,
+            (height - 5).toFloat(),//bottom
+            paint
+        )
+        canvas.drawRect(
+            getDimensionInPixel(16).toFloat(),//left,
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),//top,
+            getDimensionInPixel(19).toFloat(),// right,
+            (height - 5).toFloat(),//bottom
+            paint
+        )
+        canvas.drawRect(
+            getDimensionInPixel(20).toFloat(),//left,
+            (height - (10 + random.nextInt(((height / 1.5f) - 5).toInt()))).toFloat(),//top,
+            getDimensionInPixel(23).toFloat(),// right,
+            (height - 5).toFloat(),//bottom
             paint
         )
     }
