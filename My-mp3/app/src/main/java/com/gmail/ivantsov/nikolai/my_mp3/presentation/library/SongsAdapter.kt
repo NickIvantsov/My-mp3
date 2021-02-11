@@ -11,12 +11,9 @@ import android.widget.Filterable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.gmail.ivantsov.nikolai.core.domain.INT_NOT_INIT
 import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
-import timber.log.Timber
-import kotlin.properties.Delegates
 
 
 class SongsAdapter(
@@ -42,14 +39,13 @@ class SongsAdapter(
     lateinit var itemClickListener: (Song) -> Unit
     private val songs: MutableList<Song> = mutableListOf()
     private val songsFull: MutableList<Song> = mutableListOf()
-    private lateinit var context: Context
-    private var songItemPosition = INT_NOT_INIT
     private var songItem: Song? = null
+    private var isPlaying = false
+    private var isNewElement = false
     private val itemOnClickListener =
-        { _: View, holder: SongsViewHolder, position: Int, song: Song ->
-            songItemPosition = position
+        { _: View, holder: SongsViewHolder, context: Context, song: Song ->
             songItem = song
-            setItemColorActiveAndUpdate(holder, R.color.purple_200)
+            setItemColorActiveAndUpdate(holder, R.color.purple_200, context)
             itemClickListener(song)
         }
 
@@ -62,8 +58,7 @@ class SongsAdapter(
 
     //region интерфейсы
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        context = parent.context
-        val inflater = LayoutInflater.from(context)
+        val inflater = LayoutInflater.from(parent.context)
         return viewHolderFor(viewType, inflater, parent)
 
     }
@@ -97,34 +92,58 @@ class SongsAdapter(
             if (holder is SongsViewHolder) {
 
 
-                setItemColor(song, holder)
+                setItemColor(song, holder, holder.binding.root.context)
                 holder.binding.tvSongTitle.text = song.title
                 holder.binding.tvSongArtist.text = song.artistName
-                setAlbumArt(song, holder)
+                setAlbumArt(song, holder, holder.binding.root.context)
 
                 holder.binding.songItemContainer.setOnClickListener { view ->
+                    isNewElement = if (songItem?.id != song.id) {
+                        isPlaying = false
+                        true
+                    } else {
+                        false
+                    }
                     itemOnClickListener(
                         view,
                         holder,
-                        position,
+                        holder.binding.root.context,
                         song
                     )
+                    isPlaying = needViewVisualizer(holder)
                 }
 
-                if(songItem?.id == song.id){
+                if (songItem?.id == song.id) {
                     holder.binding.visualizer.setColor(
                         ContextCompat.getColor(
-                            context,
+                            holder.binding.root.context,
                             R.color.purple_200
                         )
                     )
-                    holder.binding.visualizer.visibility = View.VISIBLE
-                }else{
-                    holder.binding.visualizer.visibility = View.GONE
+                    if (isPlaying) {
+                        setVisualizerVisibility(holder, View.VISIBLE)
+                    } else {
+                        setVisualizerVisibility(holder, View.GONE)
+                    }
+                } else {
+                    setVisualizerVisibility(holder, View.GONE)
                 }
 
             }
         }
+    }
+
+    private fun needViewVisualizer(holder: SongsViewHolder) =
+        if (isPlaying) {
+            setVisualizerVisibility(holder, View.GONE)
+            false
+        } else {
+            setVisualizerVisibility(holder, View.VISIBLE)
+            true
+        }
+
+    private fun setVisualizerVisibility(holder: SongsViewHolder, visibility: Int) {
+        holder.binding.visualizer.visibility = visibility
     }
 
 
@@ -172,29 +191,30 @@ class SongsAdapter(
 
     private fun setItemColor(
         song: Song,
-        holder: SongsViewHolder
+        holder: SongsViewHolder,
+        context: Context
     ) {
         if (song.id == songItem?.id) {
-            setItemColorActive(holder, R.color.purple_200)
+            setItemColorActive(holder, R.color.purple_200, context)
         } else {
-            setItemColorNotActive(holder, R.color.black)
+            setItemColorNotActive(holder, R.color.black, context)
         }
     }
 
-    private fun setItemColorActiveAndUpdate(holder: SongsViewHolder, color: Int) {
-        setItemColor(holder, color)
+    private fun setItemColorActiveAndUpdate(holder: SongsViewHolder, color: Int, context: Context) {
+        setItemColor(holder, color, context)
         notifyDataSetChanged()
     }
 
-    private fun setItemColorActive(holder: SongsViewHolder, color: Int) {
-        setItemColor(holder, color)
+    private fun setItemColorActive(holder: SongsViewHolder, color: Int, context: Context) {
+        setItemColor(holder, color, context)
     }
 
-    private fun setItemColorNotActive(holder: SongsViewHolder, color: Int) {
-        setItemColor(holder, color)
+    private fun setItemColorNotActive(holder: SongsViewHolder, color: Int, context: Context) {
+        setItemColor(holder, color, context)
     }
 
-    private fun setItemColor(holder: SongsViewHolder, color: Int) {
+    private fun setItemColor(holder: SongsViewHolder, color: Int, context: Context) {
         holder.binding.tvSongTitle.setTextColor(ContextCompat.getColor(context, color))
     }
 
@@ -207,7 +227,8 @@ class SongsAdapter(
 
     private fun setAlbumArt(
         song: Song,
-        holder: SongsViewHolder
+        holder: SongsViewHolder,
+        context: Context
     ) {
         Glide.with(context)
             .load(getAlbumArtUri(song.albumId))
