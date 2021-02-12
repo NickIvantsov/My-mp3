@@ -18,5 +18,22 @@
         android:id="@+id/mainFragment"
         android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.library.MainFragment"
         android:label="main_fragment"
-        tools:layout="@layout/main_fragment" />
+        tools:layout="@layout/main_fragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_playFragment"
+            app:destination="@id/playFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/playFragment"
+        android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.playing.PlayFragment"
+        android:label="play_fragment"
+        tools:layout="@layout/play_fragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.gmail.ivantsov.nikolai.my_mp3.presentation.settings.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/settings_fragment" />
 </navigation>
