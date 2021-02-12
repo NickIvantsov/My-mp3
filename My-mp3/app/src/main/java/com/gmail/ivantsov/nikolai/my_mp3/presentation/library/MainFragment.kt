@@ -39,7 +39,7 @@ class MainFragment : Fragment() {
     private val errorMsgObserver = Observer<Int> { errorMsg ->
         Toast.makeText(context, requireContext().resources.getText(errorMsg), Toast.LENGTH_LONG)
             .show()
-        songsAdapter.isNeedPlay = false
+        songsAdapter.isNeedViewVisualizer = false
     }
     private val itemSongListener = { song: Song ->
         viewModel.playSong(song)

@@ -26,31 +26,14 @@ class MainViewModel(
     //endregion
     //region интерфейсы
     fun loadSongs() {
-        viewModelScope.launch {
-            songs.postValue(interactors.getSongs())
-        }
+        loadSongsImpl()
     }
 
     fun getSongsLiveData(): LiveData<List<Song>> = songs
     fun getErrorLiveData(): LiveData<Int> = error
 
     fun playSong(song: Song) {
-        try {
-            if (songId == song.id) {
-                if (isPlaying) {
-                    pause()
-                } else if (isPause) {
-                    resume()
-                }
-            } else {
-                play(song)
-            }
-        } catch (ex: Throwable) {
-            isPlaying = false
-            isPause = false
-            error.value = R.string.some_unknown_error_media_player
-            Timber.e(ex)
-        }
+        playSongImpl(song)
     }
 
     //endregion
@@ -71,6 +54,31 @@ class MainViewModel(
         interactors.songPause.pause()
         isPause = true
         isPlaying = false
+    }
+
+    private fun loadSongsImpl() {
+        viewModelScope.launch {
+            songs.postValue(interactors.getSongs())
+        }
+    }
+
+    private fun playSongImpl(song: Song) {
+        try {
+            if (songId == song.id) {
+                if (isPlaying) {
+                    pause()
+                } else if (isPause) {
+                    resume()
+                }
+            } else {
+                play(song)
+            }
+        } catch (ex: Throwable) {
+            isPlaying = false
+            isPause = false
+            error.value = R.string.some_unknown_error_media_player
+            Timber.e(ex)
+        }
     }
     //endregion
 }
