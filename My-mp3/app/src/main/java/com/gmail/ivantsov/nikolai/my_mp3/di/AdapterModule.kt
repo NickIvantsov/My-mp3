@@ -25,17 +25,11 @@ val adapterModule = module {
         return DividerItemDecoration(context, decoration)
     }
 
-    fun provideLinearLayoutManager(context: Context): LinearLayoutManager {
-        return LinearLayoutManager(context)
-    }
     factory {
         provideSongsAdapter(get(), get<SongsFilter>())
     }
     single {
         provideSongsFilter()
-    }
-    factory {
-        provideLinearLayoutManager(androidContext())
     }
     single {
         provideDividerItemDecoration(androidContext(), DividerItemDecoration.VERTICAL)
