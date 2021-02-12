@@ -5,4 +5,5 @@
     <string name="no_any_song">No any song!</string>
     <string name="error_inner_engine_media_player">Внутренний движок плеера не был инициализирован.</string>
     <string name="some_unknown_error_media_player">Some unknown error ...</string>
+    <string name="my_music">моя музыка</string>
 </resources>
