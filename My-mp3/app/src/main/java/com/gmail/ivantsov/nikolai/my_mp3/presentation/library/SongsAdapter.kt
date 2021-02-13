@@ -11,9 +11,9 @@ import android.widget.Filterable
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
+import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 
 
 class SongsAdapter(
@@ -39,7 +39,7 @@ class SongsAdapter(
     /**
      * обработкич щелчка по элементу списка по-умолчанию невыполняет никакой работы
      */
-    var itemClickListener: (Song) -> Unit = {}
+    var itemClickListener: (SongModel) -> Unit = {}
 
     /**
      * поле по умолчанию установлено в true что гласит о том что необходимо отобразить визуалайзер
@@ -48,15 +48,15 @@ class SongsAdapter(
      */
     var isNeedViewVisualizer = true
 
-    private val songs: MutableList<Song> = mutableListOf()
-    private val songsFull: MutableList<Song> = mutableListOf()
+    private val songs: MutableList<SongModel> = mutableListOf()
+    private val songsFull: MutableList<SongModel> = mutableListOf()
 
-    private var songItem: Song? = null
+    private var songItem: SongModel? = null
     private var isPlaying = false
     private var isNewElement = true
 
     private val itemOnClickListener =
-        { _: View, holder: SongsViewHolder, context: Context, song: Song ->
+        { _: View, holder: SongsViewHolder, context: Context, song: SongModel ->
             songItem = song
             setItemColorActiveAndUpdate(holder, R.color.purple_200, context)
             itemClickListener(song)
@@ -77,9 +77,9 @@ class SongsAdapter(
     /**
      * добавления списка новых элементов при добавлении очищает предведущие значения которые были
      * добавлены ранее
-     * @param songList спосок [Song] элементов
+     * @param songList спосок [SongModel] элементов
      */
-    fun addAll(songList: List<Song>) {
+    fun addAll(songList: List<SongModel>) {
         addAllImpl(songList)
     }
 
@@ -87,7 +87,7 @@ class SongsAdapter(
      * добавляет один элемент в имеющийся список
      * @param song аудио файл
      */
-    fun add(song: Song) {
+    fun add(song: SongModel) {
         addImpl(song)
     }
 
@@ -97,15 +97,16 @@ class SongsAdapter(
     }
 
     override fun getFilter(): Filter = songsFilter
+
     //endregion
     //region реализация
-    private fun addImpl(song: Song) {
+    private fun addImpl(song: SongModel) {
         songs.add(song)
         songsFull.add(song)
         notifyItemInserted(songs.size - 1)
     }
 
-    private fun addAllImpl(songList: List<Song>) {
+    private fun addAllImpl(songList: List<SongModel>) {
         songs.clear()
         songsFull.clear()
         songs.addAll(songList)
@@ -139,7 +140,7 @@ class SongsAdapter(
     }
 
     private fun setItemColor(
-        song: Song,
+        song: SongModel,
         holder: SongsViewHolder,
         context: Context
     ) {
@@ -175,7 +176,7 @@ class SongsAdapter(
     }
 
     private fun setAlbumArt(
-        song: Song,
+        song: SongModel,
         holder: SongsViewHolder,
         context: Context
     ) {
@@ -224,7 +225,7 @@ class SongsAdapter(
     }
 
     private fun songOnClick(
-        song: Song,
+        song: SongModel,
         view: View,
         holder: SongsViewHolder
     ) {
@@ -282,7 +283,7 @@ class SongsAdapter(
     }
 
 
-    private fun updateAfterAdd(songList: List<Song>) {
+    private fun updateAfterAdd(songList: List<SongModel>) {
         if (songList.size == LIST_HAVE_ONE_ELEMENT)
             notifyDataSetChanged()
         else {

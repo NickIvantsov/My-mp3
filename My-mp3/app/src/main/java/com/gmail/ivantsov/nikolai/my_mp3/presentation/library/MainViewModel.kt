@@ -5,22 +5,24 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gmail.ivantsov.nikolai.core.domain.LONG_NOT_INIT
-import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.framework.Interactors
+import com.gmail.ivantsov.nikolai.my_mp3.framework.LONG_NOT_INIT
+import com.gmail.ivantsov.nikolai.my_mp3.framework.SongModelDataMapper
+import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(
     application: Application,
-    private val interactors: Interactors
+    private val interactors: Interactors,
+    private val songModelDataMapper: SongModelDataMapper
 ) : AndroidViewModel(application) {
     //region поля
     private var isPlaying = false
     private var isPause = false
     private var songId = LONG_NOT_INIT
-    private val songs: MutableLiveData<List<Song>> = MutableLiveData()
+    private val songs: MutableLiveData<List<SongModel>> = MutableLiveData()
     private val error: MutableLiveData<Int> = MutableLiveData()
 
     //endregion
@@ -29,18 +31,18 @@ class MainViewModel(
         loadSongsImpl()
     }
 
-    fun getSongsLiveData(): LiveData<List<Song>> = songs
+    fun getSongsLiveData(): LiveData<List<SongModel>> = songs
     fun getErrorLiveData(): LiveData<Int> = error
 
-    fun playSong(song: Song) {
+    fun playSong(song: SongModel) {
         playSongImpl(song)
     }
 
     //endregion
     //region реализация
-    private fun play(song: Song) {
+    private fun play(song: SongModel) {
         songId = song.id
-        interactors.musicPlayer.play(song)
+        interactors.musicPlayer.play(songModelDataMapper.transform(song))
         isPlaying = true
     }
 
@@ -58,11 +60,11 @@ class MainViewModel(
 
     private fun loadSongsImpl() {
         viewModelScope.launch {
-            songs.postValue(interactors.getSongs())
+            songs.postValue(songModelDataMapper.transform(interactors.getSongs()))
         }
     }
 
-    private fun playSongImpl(song: Song) {
+    private fun playSongImpl(song: SongModel) {
         try {
             if (songId == song.id) {
                 if (isPlaying) {

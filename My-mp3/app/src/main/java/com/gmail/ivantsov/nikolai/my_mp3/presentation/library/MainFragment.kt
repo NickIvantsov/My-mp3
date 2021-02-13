@@ -14,9 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
+import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -34,7 +34,7 @@ class MainFragment : Fragment() {
     private val songsAdapter by inject<SongsAdapter>()
     private val dividerItemDecoration by inject<DividerItemDecoration>()
 
-    private val songsObserver = Observer<List<Song>> { songsList ->
+    private val songsObserver = Observer<List<SongModel>> { songsList ->
         songsAdapter.addAll(songsList)
     }
     private val errorMsgObserver = Observer<Int> { errorMsg ->
@@ -42,7 +42,7 @@ class MainFragment : Fragment() {
             .show()
         songsAdapter.isNeedViewVisualizer = false
     }
-    private val itemSongListener = { song: Song ->
+    private val itemSongListener = { song: SongModel ->
         viewModel.playSong(song)
     }
     private val searchTextListener = object : SearchView.OnQueryTextListener {
@@ -138,7 +138,7 @@ class MainFragment : Fragment() {
             }
         }
         binding.bottomNavigation.setOnNavigationItemReselectedListener { item ->
-            when(item.itemId) {
+            when (item.itemId) {
                 R.id.my_music_library -> {
                     Timber.d("setOnNavigationItemReselectedListener :: my_music_library ")
                     // Respond to navigation item 1 reselection

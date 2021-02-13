@@ -1,8 +1,8 @@
 package com.gmail.ivantsov.nikolai.my_mp3.presentation.library
 
 import android.widget.Filter
-import com.gmail.ivantsov.nikolai.core.domain.Song
 import com.gmail.ivantsov.nikolai.my_mp3.framework.IInitSongsFilterComponent
+import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -14,12 +14,12 @@ import kotlin.collections.ArrayList
  * метод обновления списка
  */
 class SongsFilter : Filter(), IInitSongsFilterComponent {
-    private lateinit var songsFull: List<Song>
-    private lateinit var songs: MutableList<Song>
+    private lateinit var songsFull: List<SongModel>
+    private lateinit var songs: MutableList<SongModel>
     private lateinit var publishResultsListener: () -> Unit
     override fun init(
-        songsFull: List<Song>,
-        songs: MutableList<Song>,
+        songsFull: List<SongModel>,
+        songs: MutableList<SongModel>,
         publishResults: () -> Unit
     ) {
         this.songsFull = songsFull
@@ -28,7 +28,7 @@ class SongsFilter : Filter(), IInitSongsFilterComponent {
     }
 
     override fun performFiltering(constraint: CharSequence?): FilterResults {
-        val filteredList = ArrayList<Song>()
+        val filteredList = ArrayList<SongModel>()
         if (constraint == null || constraint.isEmpty()) {
             filteredList.addAll(songsFull)
         } else {
@@ -46,7 +46,7 @@ class SongsFilter : Filter(), IInitSongsFilterComponent {
 
     override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
         songs.clear()
-        val res = (results?.values as? ArrayList<Song>)
+        val res = (results?.values as? ArrayList<SongModel>)
         if (res != null) {
             songs.addAll(res)
         } else {
