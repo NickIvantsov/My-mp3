@@ -3,18 +3,20 @@ package com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl
 import android.content.ContentUris
 import android.content.Context
 import android.media.MediaPlayer
-import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
 import android.provider.MediaStore
-import com.gmail.ivantsov.nikolai.core.domain.Song
+import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
 import java.io.IOException
 
 class MusicPlayerImpl(
     private val context: Context,
-    private val mediaPlayer: MediaPlayer
-) : IMusicPlayer, MediaPlayer.OnErrorListener,
-    OnCompletionListener {
+    actualMediaPlayer: MediaPlayer
+) : IMusicPlayer {
+
+    private var actualMediaPlayer: MediaPlayer = actualMediaPlayer
+    private lateinit var nextMediaPlayer: MediaPlayer
+
     //region интерфейсы
     @Throws(
         IOException::class,
@@ -22,13 +24,15 @@ class MusicPlayerImpl(
         IllegalStateException::class,
         SecurityException::class
     )
-    override fun play(song: Song) {
-        playImpl(song, mediaPlayer, context)
+    override fun play(song: SongModel) {
+        playImpl(song, actualMediaPlayer, context)
     }
+
+    override fun isPlaying() = isPlayingImpl()
 
     @Throws(IllegalStateException::class)
     override fun pause() {
-        pauseImpl(mediaPlayer)
+        pauseImpl(actualMediaPlayer)
     }
 
     private fun pauseImpl(mediaPlayer: MediaPlayer) {
@@ -36,18 +40,39 @@ class MusicPlayerImpl(
     }
 
     override fun resume() {
-        resumeSong(mediaPlayer)
+        resumeSong(actualMediaPlayer)
     }
+
+    override fun getCurrentPosition() = getCurrentPositionImpl()
+    override fun seekTo(timeMs: Int) = seekToImpl(timeMs)
+    override fun getDuration() = getDurationImpl()
+
+    override fun onError(mediaPlayer: MediaPlayer?, what: Int, extra: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCompletion(mediaPlayer: MediaPlayer?) {
+        TODO("Not yet implemented")
+    }
+
+    private fun getDurationImpl() = actualMediaPlayer.duration
 
     //endregion
     //region реализация
+    private fun isPlayingImpl() = actualMediaPlayer.isPlaying
+    private fun seekToImpl(timeMs: Int) {
+        actualMediaPlayer.seekTo(timeMs)
+    }
+
+    private fun getCurrentPositionImpl() = actualMediaPlayer.currentPosition
+
     @Throws(
         IOException::class,
         IllegalArgumentException::class,
         IllegalStateException::class,
         SecurityException::class
     )
-    private fun playImpl(song: Song, mediaPlayer: MediaPlayer, context: Context) {
+    private fun playImpl(song: SongModel, mediaPlayer: MediaPlayer, context: Context) {
         resetSong(mediaPlayer)
         setDataSource(song, mediaPlayer, context)
         prepareSong(mediaPlayer)
@@ -60,7 +85,7 @@ class MusicPlayerImpl(
         IllegalStateException::class,
         SecurityException::class
     )
-    private fun setDataSource(song: Song, mediaPlayer: MediaPlayer, context: Context) {
+    private fun setDataSource(song: SongModel, mediaPlayer: MediaPlayer, context: Context) {
         mediaPlayer.setDataSource(context, getSongUri(song))
     }
 
@@ -73,7 +98,7 @@ class MusicPlayerImpl(
         mediaPlayer.reset()
     }
 
-    private fun getSongUri(song: Song): Uri =
+    private fun getSongUri(song: SongModel): Uri =
         ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, song.id)
 
     @Throws(IllegalStateException::class)
@@ -86,13 +111,6 @@ class MusicPlayerImpl(
         playSong(mediaPlayer)
     }
 
-    override fun onError(p0: MediaPlayer?, p1: Int, p2: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun onCompletion(p0: MediaPlayer?) {
-        TODO("Not yet implemented")
-    }
     //endregion
 
 }

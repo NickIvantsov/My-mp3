@@ -11,7 +11,6 @@ import com.gmail.ivantsov.nikolai.my_mp3.framework.LONG_NOT_INIT
 import com.gmail.ivantsov.nikolai.my_mp3.framework.SongModelDataMapper
 import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
 import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
-import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl.MusicPlayerImpl
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -45,7 +44,7 @@ class MainViewModel(
     //region реализация
     private fun play(song: SongModel) {
         songId = song.id
-       musicPlayer.play(songModelDataMapper.transform(song))
+        musicPlayer.play(song)
         isPlaying = true
     }
 

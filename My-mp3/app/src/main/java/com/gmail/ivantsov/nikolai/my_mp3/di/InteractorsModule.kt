@@ -2,9 +2,10 @@ package com.gmail.ivantsov.nikolai.my_mp3.di
 
 import android.content.Context
 import android.media.MediaPlayer
-import com.gmail.ivantsov.nikolai.core.data.SongRepository
-import com.gmail.ivantsov.nikolai.core.interactors.*
+import com.gmail.ivantsov.nikolai.core.data.ISongRepository
+import com.gmail.ivantsov.nikolai.core.interactors.GetSongs
 import com.gmail.ivantsov.nikolai.my_mp3.framework.Interactors
+import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
 import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl.MusicPlayerImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module.module
@@ -18,7 +19,7 @@ val interactorsModule = module {
         )
     }
 
-    fun provideGetSongs(songRepository: SongRepository): GetSongs {
+    fun provideGetSongs(songRepository: ISongRepository): GetSongs {
         return GetSongs(songRepository)
     }
 
@@ -28,5 +29,5 @@ val interactorsModule = module {
     }
     single { provideInteractors(get()) }
     single { provideGetSongs(get()) }
-    single { provideMusicPlayImpl(androidContext(), get()) }
+    single { provideMusicPlayImpl(androidContext(), get()) } bind IMusicPlayer::class
 }
