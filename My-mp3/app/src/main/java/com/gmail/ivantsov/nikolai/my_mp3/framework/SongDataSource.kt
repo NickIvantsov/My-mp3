@@ -5,7 +5,6 @@ import android.database.Cursor
 import android.provider.MediaStore
 import android.text.TextUtils
 import com.gmail.ivantsov.nikolai.core.data.ISongDataSource
-import com.gmail.ivantsov.nikolai.core.domain.Artist
 import com.gmail.ivantsov.nikolai.core.domain.Song
 
 
@@ -30,19 +29,8 @@ class SongDataSource(private val context: Context) : ISongDataSource {
         private const val MEDIA_ALBUM_ID = "album_id"
     }
 
-    override suspend fun add(song: Song) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun read(artist: Artist): List<Song> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun readAll() = getAllSongs(context)
-    override suspend fun remove(song: Song) {
-        TODO("Not yet implemented")
-    }
-
 
     private fun getAllSongs(context: Context): List<Song> {
         val cursor = makeSongCursor(context)
