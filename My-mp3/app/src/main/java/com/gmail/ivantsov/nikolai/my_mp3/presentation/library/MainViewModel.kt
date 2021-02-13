@@ -40,18 +40,18 @@ class MainViewModel(
     //region реализация
     private fun play(song: Song) {
         songId = song.id
-        interactors.songPlay.play(song)
+        interactors.musicPlayer.play(song)
         isPlaying = true
     }
 
     private fun resume() {
-        interactors.songResume.resume()
+        interactors.musicPlayer.resume()
         isPlaying = true
         isPause = false
     }
 
     private fun pause() {
-        interactors.songPause.pause()
+        interactors.musicPlayer.pause()
         isPause = true
         isPlaying = false
     }

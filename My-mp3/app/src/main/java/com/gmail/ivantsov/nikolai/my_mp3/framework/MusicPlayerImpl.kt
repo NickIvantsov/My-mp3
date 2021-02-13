@@ -5,14 +5,16 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.net.Uri
 import android.provider.MediaStore
-import com.gmail.ivantsov.nikolai.core.domain.IPauseSong
-import com.gmail.ivantsov.nikolai.core.domain.IPlaySong
-import com.gmail.ivantsov.nikolai.core.domain.IResumeSong
+import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IPauseSong
+import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IPlaySong
+import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IResumeSong
 import com.gmail.ivantsov.nikolai.core.domain.Song
+import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IMusicPlayer
 import java.io.IOException
 
-class MusicPlayer(private val context: Context, private val mediaPlayer: MediaPlayer) :
-    IPlaySong, IPauseSong, IResumeSong {
+class MusicPlayerImpl(
+    private val context: Context,
+    private val mediaPlayer: MediaPlayer) : IMusicPlayer {
     //region интерфейсы
     @Throws(
         IOException::class,
