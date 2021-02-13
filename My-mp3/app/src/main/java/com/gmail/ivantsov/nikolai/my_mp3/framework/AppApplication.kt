@@ -17,7 +17,8 @@ class AppApplication : Application() {
                 interactorsModule,
                 repositoryModule,
                 adapterModule,
-                mediaPlayerModule
+                mediaPlayerModule,
+                navigatorModule
             )
         )
         setLogTimberPlane()

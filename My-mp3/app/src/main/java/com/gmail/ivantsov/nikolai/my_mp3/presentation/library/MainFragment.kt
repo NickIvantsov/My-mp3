@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.ivantsov.nikolai.my_mp3.R
 import com.gmail.ivantsov.nikolai.my_mp3.databinding.MainFragmentBinding
 import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
+import com.gmail.ivantsov.nikolai.my_mp3.framework.navigator.Navigator
 import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 
 class MainFragment : Fragment() {
@@ -32,6 +32,7 @@ class MainFragment : Fragment() {
 
     private val viewModel by inject<MainViewModel>()
     private val songsAdapter by inject<SongsAdapter>()
+    private val navigator by inject<Navigator>()
     private val dividerItemDecoration by inject<DividerItemDecoration>()
 
     private val songsObserver = Observer<List<SongModel>> { songsList ->
@@ -56,7 +57,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private val onMenuItemClickListener = { menuItem: MenuItem ->
+    private val onTopMenuItemClickListener = { menuItem: MenuItem ->
         when (menuItem.itemId) {
             R.id.action_search -> {
                 val searchManager =
@@ -74,6 +75,22 @@ class MainFragment : Fragment() {
                     }
 
                 }
+                true
+            }
+            else -> false
+        }
+    }
+    private val onBottomNavigationItemSelectedListener = { item: MenuItem ->
+        when (item.itemId) {
+            R.id.my_music_library -> {
+                true
+            }
+            R.id.play_now -> {
+                navigator.navigateToPlayingSong(findNavController())
+                true
+            }
+            R.id.settings -> {
+                navigator.navigateToSettings(findNavController())
                 true
             }
             else -> false
@@ -115,45 +132,9 @@ class MainFragment : Fragment() {
         viewModel.getSongsLiveData().observe(viewLifecycleOwner, songsObserver)
         viewModel.getErrorLiveData().observe(viewLifecycleOwner, errorMsgObserver)
         songsAdapter.itemClickListener = itemSongListener
-        binding.toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
-        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.my_music_library -> {
-                    Timber.d("setOnNavigationItemSelectedListener :: my_music_library ")
-                    true
-                }
-                R.id.play_now -> {
-
-                    Timber.d("setOnNavigationItemSelectedListener :: play_now ")
-                    findNavController().navigate(R.id.playFragment)
-                    true
-                }
-                R.id.settings -> {
-
-                    Timber.d("setOnNavigationItemSelectedListener :: settings ")
-                    findNavController().navigate(R.id.settingsFragment)
-                    true
-                }
-                else -> false
-            }
-        }
-        binding.bottomNavigation.setOnNavigationItemReselectedListener { item ->
-            when (item.itemId) {
-                R.id.my_music_library -> {
-                    Timber.d("setOnNavigationItemReselectedListener :: my_music_library ")
-                    // Respond to navigation item 1 reselection
-                }
-                R.id.play_now -> {
-
-                    Timber.d("setOnNavigationItemReselectedListener :: play_now ")
-                    // Respond to navigation item 2 reselection
-                }
-                R.id.settings -> {
-
-                    Timber.d("setOnNavigationItemReselectedListener :: settings ")
-                    // Respond to navigation item 2 reselection
-                }
-            }
-        }
+        binding.toolbar.setOnMenuItemClickListener(onTopMenuItemClickListener)
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(
+            onBottomNavigationItemSelectedListener
+        )
     }
 }
