@@ -1,20 +1,20 @@
-package com.gmail.ivantsov.nikolai.my_mp3.framework
+package com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl
 
 import android.content.ContentUris
 import android.content.Context
 import android.media.MediaPlayer
+import android.media.MediaPlayer.OnCompletionListener
 import android.net.Uri
 import android.provider.MediaStore
-import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IPauseSong
-import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IPlaySong
-import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IResumeSong
 import com.gmail.ivantsov.nikolai.core.domain.Song
-import com.gmail.ivantsov.nikolai.core.domain.musicPlayer.IMusicPlayer
+import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
 import java.io.IOException
 
 class MusicPlayerImpl(
     private val context: Context,
-    private val mediaPlayer: MediaPlayer) : IMusicPlayer {
+    private val mediaPlayer: MediaPlayer
+) : IMusicPlayer, MediaPlayer.OnErrorListener,
+    OnCompletionListener {
     //region интерфейсы
     @Throws(
         IOException::class,
@@ -84,6 +84,14 @@ class MusicPlayerImpl(
     @Throws(IllegalStateException::class)
     private fun resumeSong(mediaPlayer: MediaPlayer) {
         playSong(mediaPlayer)
+    }
+
+    override fun onError(p0: MediaPlayer?, p1: Int, p2: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCompletion(p0: MediaPlayer?) {
+        TODO("Not yet implemented")
     }
     //endregion
 

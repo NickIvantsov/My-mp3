@@ -10,13 +10,16 @@ import com.gmail.ivantsov.nikolai.my_mp3.framework.Interactors
 import com.gmail.ivantsov.nikolai.my_mp3.framework.LONG_NOT_INIT
 import com.gmail.ivantsov.nikolai.my_mp3.framework.SongModelDataMapper
 import com.gmail.ivantsov.nikolai.my_mp3.framework.model.SongModel
+import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
+import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl.MusicPlayerImpl
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(
     application: Application,
     private val interactors: Interactors,
-    private val songModelDataMapper: SongModelDataMapper
+    private val songModelDataMapper: SongModelDataMapper,
+    private val musicPlayer: IMusicPlayer
 ) : AndroidViewModel(application) {
     //region поля
     private var isPlaying = false
@@ -42,18 +45,18 @@ class MainViewModel(
     //region реализация
     private fun play(song: SongModel) {
         songId = song.id
-        interactors.musicPlayer.play(songModelDataMapper.transform(song))
+       musicPlayer.play(songModelDataMapper.transform(song))
         isPlaying = true
     }
 
     private fun resume() {
-        interactors.musicPlayer.resume()
+        musicPlayer.resume()
         isPlaying = true
         isPause = false
     }
 
     private fun pause() {
-        interactors.musicPlayer.pause()
+        musicPlayer.pause()
         isPause = true
         isPlaying = false
     }
