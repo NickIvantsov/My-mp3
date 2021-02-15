@@ -1,7 +1,6 @@
 package com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer
 
-import android.media.MediaPlayer.OnCompletionListener
-import android.media.MediaPlayer.OnErrorListener
+import android.media.MediaPlayer
 
 interface IMusicPlayer :
     IPauseSong,
@@ -10,7 +9,8 @@ interface IMusicPlayer :
     ISongCurrentPosition,
     ISongSeekTo,
     IFileDuration,
-    OnErrorListener,
-    OnCompletionListener {
+    MediaPlayer.OnErrorListener,
+    MediaPlayer.OnCompletionListener {
     fun isPlaying(): Boolean
+    fun setPlaybackListener(listener: IPlaybackListener)
 }
