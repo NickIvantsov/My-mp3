@@ -2,8 +2,10 @@ package com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.impl
 
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.audiofx.AudioEffect
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.MediaStore
@@ -12,11 +14,12 @@ import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IMusicPlayer
 import com.gmail.ivantsov.nikolai.my_mp3.framework.musicPlayer.IPlaybackListener
 import java.io.IOException
 
+/**
+ *
+ */
 class MusicPlayerImpl(
     private val context: Context,
-    private var actualMediaPlayer: MediaPlayer,
-    private val onErrorListener: MediaPlayer.OnErrorListener,
-    private val onCompletionListener: MediaPlayer.OnCompletionListener
+    private var actualMediaPlayer: MediaPlayer
 ) : IMusicPlayer {
     //region поля
     private var nextMediaPlayer: MediaPlayer? = null
@@ -40,8 +43,8 @@ class MusicPlayerImpl(
             actualMediaPlayer,
             context,
             audioAttributes,
-            onCompletionListener,
-            onErrorListener
+            this,
+            this
         )
     }
 
@@ -50,10 +53,48 @@ class MusicPlayerImpl(
         playbackListener = listener
     }
 
+    override fun setDataSource(song: SongModel) {
+        setDataSourceImpl(
+            song,
+            actualMediaPlayer,
+            context,
+            audioAttributes,
+            this,
+            this,
+            getNewIntent()
+        )
+        actualMediaPlayer.setNextMediaPlayer(null)
+        nextMediaPlayer?.release()
+        nextMediaPlayer = null
+    }
+
+    override fun start() {
+        actualMediaPlayer.start()
+    }
+
+    override fun stop() {
+        actualMediaPlayer.stop()
+    }
+
+    override fun release() {
+        stop()
+        actualMediaPlayer.release()
+        nextMediaPlayer?.release()
+    }
+
     @Throws(IllegalStateException::class)
     override fun pause() {
         pauseImpl(actualMediaPlayer)
     }
+
+    override fun position(): Int = actualMediaPlayer.currentPosition
+
+    override fun setVolume(vol: Float) {
+        actualMediaPlayer.setVolume(vol, vol)
+    }
+
+    override fun getAudioSessionId(): Int = actualMediaPlayer.audioSessionId
+
 
     private fun pauseImpl(mediaPlayer: MediaPlayer) {
         mediaPlayer.pause()
@@ -86,9 +127,42 @@ class MusicPlayerImpl(
         }
     }
 
+    override fun setNextDataSource(song: SongModel) {
+        actualMediaPlayer.setNextMediaPlayer(null)
+        resetSong(actualMediaPlayer)
+        val mediaPlayer = MediaPlayer().apply {
+            setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK)
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+        }
+        setDataSourceImpl(
+            song,
+            actualMediaPlayer,
+            context,
+            audioAttributes,
+            this,
+            this,
+            getNewIntent()
+        )
+        nextMediaPlayer = mediaPlayer
+        actualMediaPlayer.setNextMediaPlayer(mediaPlayer)
+    }
+
 
     //endregion
     //region реализация
+
+    private fun getNewIntent() =
+        Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
+            putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId())
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+
+        }
 
     private fun getDurationImpl() = actualMediaPlayer.duration
     private fun isPlayingImpl() = actualMediaPlayer.isPlaying
@@ -113,15 +187,15 @@ class MusicPlayerImpl(
         onErrorListener: MediaPlayer.OnErrorListener
     ) {
         resetSong(mediaPlayer)
-        setDataSource(
+        setDataSourceImpl(
             song,
             mediaPlayer,
             context,
             audioAttributes,
             onCompletionListener,
-            onErrorListener
+            onErrorListener,
+            getNewIntent()
         )
-        prepareSong(mediaPlayer)
         playSong(mediaPlayer)
     }
 
@@ -131,20 +205,24 @@ class MusicPlayerImpl(
         IllegalStateException::class,
         SecurityException::class
     )
-    private fun setDataSource(
+    private fun setDataSourceImpl(
         song: SongModel,
         mediaPlayer: MediaPlayer,
         context: Context,
         audioAttributes: AudioAttributes,
         onCompletionListener: MediaPlayer.OnCompletionListener,
-        onErrorListener: MediaPlayer.OnErrorListener
+        onErrorListener: MediaPlayer.OnErrorListener,
+        intent: Intent
     ) {
         mediaPlayer.apply {
+            this.reset()
+            setOnPreparedListener(null)
             setDataSource(context, getSongUri(song))
             setAudioAttributes(audioAttributes)
-            prepare()
+            prepareSong(this)
             setOnCompletionListener(onCompletionListener)
             setOnErrorListener(onErrorListener)
+            context.sendBroadcast(intent)
         }
     }
 
